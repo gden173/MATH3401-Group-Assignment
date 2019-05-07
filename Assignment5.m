@@ -8,7 +8,7 @@
 % N =  1,2,..,5 and 8 radial lines at Arg(z) = -3pi/4,...,pi
 %-----------------------------------------
 clear all;  clc; clf;  % Clear all saved variables and figures
-N = 24;                % set number of line segments 
+N = 100;                % set number of line segments 
 % plot all five circles on the same graph, blue lines
 plt_ax = [-1.1,1.1, -1.1,1.1];  % plot axis
 x = linspace(0,2*pi,N);  % theta from 0 to 2pi
@@ -69,7 +69,7 @@ ylabel('Im', 'Fontsize', 20)
 % define a new function mapb, f(z) = (i + iz)/(1-z)
 % To get different values for N it must be changed in 1.B.
 
-mapb = @(x,y)[-2*y./((1-x).^2 + y.^2); (1-x.^2 - y.^2)./((1-x).^2 + y.^2)];
+mapb = @(x,y)[-2*y./((1-x).^2 + y.^2); (1-x.^2 - y.^2)./((1-x).^2 + y.^2)];  % f(z) = u(x,y) + iv(x,y)
 
 mat = zeros(10,N); % redefine mat
 line1 = mapb(z1,z1);line2 = mapb(z1,-z1); line3 = mapb(z, zeros(1,length(N))); line4 =  mapb(zeros(1,length(N)),z); % map lines
@@ -85,13 +85,30 @@ plot(line1(1,:), line1(2,:),'r.',line2(1,:), line2(2,:),'r.',line3(1,:), line3(2
     line4(1,:), line4(2,:),'r.','MarkerSize',6)
 hold off
 grid on; axis equal;
-axis([-10,10, -10,10]);
+axis([-20,20,-20,20])
 title('$$f(z)$$', 'Interpreter','latex', 'Fontsize', 20)
 xlabel('Re', 'Fontsize', 20)
 ylabel('Im', 'Fontsize', 20)
 %%
 %--------------------------------------------------------------------------
-%Q2:  First plot the curve f(gamma)
+%Q2:  First plot the curve f(gamma), |z| = 2
+% set x and y
+num = linspace(0,2*pi, 100);
+x = 2*cos(num);
+y = 2*sin(num);
+z = complex(x,y);  % create the complex coordinates
+func = @(z) ((1 + z).^2/4);  % function
+figure
+plot(real(func(z)),imag(func(z)),'b', 'Linewidth',3)
+grid on 
+axis equal 
+axis([-1.1, 3.1, -2.1, 2.1])
+xlabel('Re','Fontsize', 20)
+ylabel('Im','Fontsize', 20)
+title('Plot of $$f(z) = \frac{(1 + z)^2}{4}$$ on the curve $$ \gamma = \{z:|z| = 2\}$$',...
+    'Interpreter','latex', 'Fontsize',20)
+print('gamma_curve','-dpng')
+
 
 %% Contour integration function
 % Q2.a and Q2.b
