@@ -8,7 +8,7 @@
 % N =  1,2,..,5 and 8 radial lines at Arg(z) = -3pi/4,...,pi
 %-----------------------------------------
 clear all;  clc; clf;  % Clear all saved variables and figures
-N = 100;                % set number of line segments 
+N = 500;                % set number of line segments 
 % plot all five circles on the same graph, blue lines
 plt_ax = [-1.1,1.1, -1.1,1.1];  % plot axis
 x = linspace(0,2*pi,N);  % theta from 0 to 2pi
@@ -68,13 +68,16 @@ ylabel('Im', 'Fontsize', 20)
 %-------------------------------------------------------------------
 % define a new function mapb, f(z) = (i + iz)/(1-z)
 % To get different values for N it must be changed in 1.B.
-
+% Set number of steps
+N = 25;  % use length of z,z1 as a guide 
+dim = size(circles); ncol = dim(2); % find dimensions of circles
+idx = 1:floor(ncol/N):ncol; idx1 = 1:floor(ncol/N):ncol*2; 
 mapb = @(x,y)[-2*y./((1-x).^2 + y.^2); (1-x.^2 - y.^2)./((1-x).^2 + y.^2)];  % f(z) = u(x,y) + iv(x,y)
 
 mat = zeros(10,N); % redefine mat
-line1 = mapb(z1,z1);line2 = mapb(z1,-z1); line3 = mapb(z, zeros(1,length(N))); line4 =  mapb(zeros(1,length(N)),z); % map lines
+line1 = mapb(z1(idx1),z1(idx1));line2 = mapb(z1(idx1),-z1(idx1)); line3 = mapb(z(idx), zeros(1,length(N))); line4 =  mapb(zeros(1,length(N)),z(idx)); % map lines
 for i = 1:2:10
-    mat(i:i+1,:) = mapb(circles(i,:), circles(i+1,:));  % map circles
+    mat(i:i+1,:) = mapb(circles(i,idx), circles(i+1,idx));  % map circles
 end
 figure   % plot co domain 
 hold on 
@@ -133,7 +136,14 @@ int2 = trap(func, r,N);
 disp(round(int2/(1i*pi),1))  % integral is equal to 5 which is what my analytic integration found
 %|f(z)|^2 is not analytic at zero so integral is not equal to zero
 
-
+%% 
+%--------------------------------------------------------------------------
+% Bonus question winding number
+func = @(z) (0.5*(1 + z))/((1/4)*(1 + z).^2 + 1/2);
+N = 100;
+r = 2;
+int3 = trap(func,r,N);  
+fprintf('To get the winding number divide by 2pi(i) and we get %f1.0 /n', int3/(2*pi*1i))
 %%  Contour Integration Function
 
 function [int] = trap(func, r,N)
