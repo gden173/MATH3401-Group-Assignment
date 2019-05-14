@@ -8,30 +8,24 @@
 % N =  1,2,..,5 and 8 radial lines at Arg(z) = -3pi/4,...,pi
 %-----------------------------------------
 clear all;  clc; clf;  % Clear all saved variables and figures
-N = 500;                % set number of line segments 
+N = 24;                % set number of line segments 
 % plot all five circles on the same graph, blue lines
 plt_ax = [-1.1,1.1, -1.1,1.1];  % plot axis
-x = linspace(0,2*pi,N);  % theta from 0 to 2pi
-z1 = linspace(-1/sqrt(2),1/sqrt(2),N*2); z = linspace(-1,1,N*2); % coordinates for  diagonal lines   
 
-
-circles = zeros(10,length(x)); % Empty matrix to place coordinates in 
-rad = [1/5,2/5, 3/5, 4/5, 1];   % vector of circl radii
-
-for i = 1:2:10  % plot x,y coordinates using polar coordinates x = rcos(theta), y = rsin(theta)
-    circles(i,:) = rad(ceil(i/2))*cos(x);
-    circles(i+1,:) = rad(ceil(i/2))*sin(x);
-end
+coords = pltcords(N);
 
 % plot on figure using blue for circles and red dotted for radial lines 
 f = figure;
-subplot(1,2,1)
+
 hold on 
-for i = 1:2:10    
-   plot(circles(i,:), circles(i+1,:), 'b', 'Linewidth', 2)  % plot circles 
+for i = 1:5    
+   plot(real(coords{i}), imag(coords{i}), 'b', 'Linewidth', 2)  % plot circles 
 end
+for i = 6:13    
+   plot(real(coords{i}), imag(coords{i}), 'r.', 'Linewidth', 2)  % plot circles 
+end
+
 axis equal; grid on;
-plot(z1, z1, 'r.', z ,zeros(1,length(N)),'r.',zeros(1,length(N)), z, 'r.', z1, -z1, 'r.', 'MarkerSize',6); % plot lines 
 hold off
 axis(plt_ax)
 xlabel('Re', 'Fontsize', 20); ylabel('Im', 'Fontsize', 20)  % x,y labels
@@ -44,22 +38,33 @@ title('$$z$$','Interpreter','latex', 'Fontsize', 20)  % title
 % We already have the pre image, now just creat the image
 % function is f(z) = (1+z)^2/4
 
-map = @(x,y) [(1 + 2*x + x.^2 - y.^2)/4 ; (y + x.*y)/2];  % map = [ u(x,y), v(x,y)]
-mat = zeros(10,N);   % empty matrix 
-line1 = map(z1,z1);line2 = map(z1,-z1); line3 = map(z, zeros(1,length(N))); line4 =  map(zeros(1,length(N)),z);  % map lines
-for i = 1:2:10
-    mat(i:i+1,:) = map(circles(i,:), circles(i+1,:));  % map circles
+mapper = @(z)  (1 + z).^2/4;
+
+for i = 1:13
+    map{i} = mapper(coords{i});
 end
+subplot(1,2,1)
+hold on 
+for i = 1:5    
+   plot(real(coords{i}), imag(coords{i}), 'b', 'Linewidth', 2)  % plot circles 
+end
+for i = 6:13    
+   plot(real(coords{i}), imag(coords{i}), 'r.', 'Linewidth', 2)  % plot circles 
+end
+hold off; grid on 
+axis equal; axis(plt_ax)
 subplot(1,2,2)
 hold on 
-for i = 1:2:10    
-   plot(mat(i,:), mat(i+1,:), 'b', 'Linewidth', 2)  % plot circles 
+for i = 1:5    
+   plot(real(map{i}), imag(map{i}), 'b', 'Linewidth', 2)  % plot circles 
 end
-plot(line1(1,:), line1(2,:),'r.',line2(1,:), line2(2,:),'r.',line3(1,:), line3(2,:),'r.',...
-    line4(1,:), line4(2,:),'r.','MarkerSize',6)   % plot lines 
+for i = 6:13    
+   plot(real(map{i}), imag(map{i}), 'r.', 'Linewidth', 2)  % plot circles 
+end
+
 hold off
 grid on; axis equal;
-axis([-1.1,1.1, -1.1,1.1]);
+axis(plt_ax);
 title('$$f(z)$$', 'Interpreter','latex', 'Fontsize', 20)
 xlabel('Re', 'Fontsize', 20)
 ylabel('Im', 'Fontsize', 20)
@@ -69,29 +74,31 @@ ylabel('Im', 'Fontsize', 20)
 % define a new function mapb, f(z) = (i + iz)/(1-z)
 % To get different values for N it must be changed in 1.B.
 % Set number of steps
-N = 25;  % use length of z,z1 as a guide 
-dim = size(circles); ncol = dim(2); % find dimensions of circles
-idx = 1:floor(ncol/N):ncol; idx1 = 1:floor(ncol/N):ncol*2; 
-mapb = @(x,y)[-2*y./((1-x).^2 + y.^2); (1-x.^2 - y.^2)./((1-x).^2 + y.^2)];  % f(z) = u(x,y) + iv(x,y)
+  % use length of z,z1 as a guide 
+  %set N
+  N = 10;
+ coords = pltcords(N);
+mapper = @(z)  (1 + 1i*z)./(1-z);
 
-mat = zeros(10,N); % redefine mat
-line1 = mapb(z1(idx1),z1(idx1));line2 = mapb(z1(idx1),-z1(idx1)); line3 = mapb(z(idx), zeros(1,length(N))); line4 =  mapb(zeros(1,length(N)),z(idx)); % map lines
-for i = 1:2:10
-    mat(i:i+1,:) = mapb(circles(i,idx), circles(i+1,idx));  % map circles
+for i = 1:13
+    map{i} = mapper(coords{i});
 end
-figure   % plot co domain 
+
 hold on 
-for i = 1:2:10    
-   plot(mat(i,:), mat(i+1,:), 'b', 'Linewidth', 2)
+for i = 1:5    
+   plot(real(map{i}), imag(map{i}), 'b', 'Linewidth', 2)  % plot circles 
 end
-plot(line1(1,:), line1(2,:),'r.',line2(1,:), line2(2,:),'r.',line3(1,:), line3(2,:),'r.',...
-    line4(1,:), line4(2,:),'r.','MarkerSize',6)
+for i = 7:13    
+   plot(real(map{i}), imag(map{i}), 'r.', 'Linewidth', 2)  % plot circles 
+end
+ plot(real(map{6}), imag(map{6}), 'k.', 'Linewidth', 2)  % plot circles
 hold off
 grid on; axis equal;
-axis([-20,20,-20,20])
-title('$$f(z)$$', 'Interpreter','latex', 'Fontsize', 20)
+axis([-10,10, -10,10]);
+title(['$$f(z)$$, N = ',num2str(N)], 'Interpreter','latex', 'Fontsize', 20)
 xlabel('Re', 'Fontsize', 20)
 ylabel('Im', 'Fontsize', 20)
+
 %%
 %--------------------------------------------------------------------------
 %Q2:  First plot the curve f(gamma), |z| = 2
@@ -120,11 +127,11 @@ print('gamma_curve','-dpng')
 %%
 %-------------------------------------------------------------------------
 %Q2.a
-func = @(z) ((1 + z).^2/4);
+func = @(z) ((1 + z).^2/4);  % function
 N = 100;  %steps
 r = 2; % radius
 [int1] = trap(func, r,N);  % int
-disp(int1)  % Integral is equal to zero as expected 
+fprintf('The Value of the Contour integral is %4.2f   \n', int1)
 %% 
 %--------------------------------------------------------------------------
 %Q2.b
@@ -133,9 +140,7 @@ func = @(z) norm((1 + z).^2/4).^2 ;  % norm squared function
 N = 100;
 r = 2;
 int2 = trap(func, r,N);
-disp(round(int2/(1i*pi),1))  % integral is equal to 5 which is what my analytic integration found
-%|f(z)|^2 is not analytic at zero so integral is not equal to zero
-
+fprintf('The Value of the Contour integral is %4.2f   \n', int2/(pi*1i)) 
 %% 
 %--------------------------------------------------------------------------
 % Bonus question winding number
@@ -143,8 +148,37 @@ func = @(z) (0.5*(1 + z))/((1/4)*(1 + z).^2 + 1/2);
 N = 100;
 r = 2;
 int3 = trap(func,r,N);  
-fprintf('To get the winding number divide by 2pi(i) and we get %f1.0 /n', int3/(2*pi*1i))
+fprintf('To get the winding number divide by 2*pi*i which results in a value of  %4.2f  \n', int3/(2*pi*1i))
 %%  Contour Integration Function
+
+
+function [coords] = pltcords(N)
+
+theta = linspace(0,7*pi/4,8);
+theta1 = linspace(0,2*pi,N);
+pts = linspace(0,1,N);
+rad = linspace(1,1/5,5);
+
+
+for j = 1:5
+    x1 = rad(j)*cos(theta1);
+    y1 = rad(j)*sin(theta1);
+    z = complex(x1,y1);
+    coords{j} = z;
+end
+k = 6;
+for j = 1:8
+    x1 = pts*cos(theta(j));
+    y1 = pts*sin(theta(j));
+    z = complex(x1,y1);
+    coords{k} = z;
+    k = k+1;
+end
+
+end
+
+
+
 
 function [int] = trap(func, r,N)
 % [int] = trap(func, r,N) takes a function handle FUNC
